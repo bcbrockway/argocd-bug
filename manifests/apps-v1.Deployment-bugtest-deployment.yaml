@@ -29,7 +29,7 @@ spec:
         envFrom:
         - secretRef:
             name: shared-secret
-        image: busybox:latest
+        image: busybox:1.29.1
         imagePullPolicy: IfNotPresent
         name: main
       serviceAccountName: shared-sa
