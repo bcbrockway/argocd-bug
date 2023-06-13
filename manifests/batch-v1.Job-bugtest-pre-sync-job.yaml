@@ -18,7 +18,7 @@ spec:
         envFrom:
         - secretRef:
             name: shared-secret
-        image: busybox:1.29.4
+        image: busybox:1.29.5
         imagePullPolicy: IfNotPresent
         name: main
       restartPolicy: Never
