@@ -31,5 +31,9 @@ spec:
             name: shared-secret
         image: busybox:1.30.0
         imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /fake-path
+            port: 8080
         name: main
       serviceAccountName: shared-sa
