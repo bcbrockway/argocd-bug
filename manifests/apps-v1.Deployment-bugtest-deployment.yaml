@@ -32,7 +32,7 @@ spec:
             name: shared-secret
         image: busybox:1.30.0
         imagePullPolicy: IfNotPresent
-        livenessProbe:
+        readinessProbe:
           httpGet:
             path: /fake-path
             port: 8080
