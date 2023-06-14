@@ -1,19 +1,20 @@
-wget https://github.com/argoproj/argo-cd/raw/v2.7.1/manifests/install.yaml
-Modified install.yaml (added --insecure to server args)
+To create install.yaml I just did:
 
+* `wget https://github.com/argoproj/argo-cd/raw/v2.7.1/manifests/install.yaml`
+* Modified install.yaml (added --insecure to server args)
 
-## Set up cluster
-k3d cluster create argocd-bug --agents 2
+To replicate the bug:
 
-## Set up ArgoCD
-```shell
-kubectl create ns argocd
-kubectl apply -f install.yaml -n argocd
-sleep 10
-kubectl get secret -n argocd argocd-initial-admin-secret -ojson | jq -r '.data.password' | base64 -d
-kubectl port-forward -n argocd $(kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server -oname) 8080
-```
+1. Run `./startup.sh` (you'll need k3d)
+1. Create the Application in ArgoCD
+    ```shell
+    kubectl create ns bugtest
+    kubectl apply -f argoproj.io-v1alpha1.Application-argocd-bugtest.yaml -n argocd
+    ```
+1. Sync will fail and will not retry (I've intentionally set up the readinessProbe so that it never succeeds and reduced the `progressDeadlineSeconds` to 20). The resources created in the PreSync hook are still there as we expect.
+1. Sync again manually ensuring you UNTICK the RETRY tickbox
 
-## Set up example app
-kubectl create ns bugtest
-kubectl apply -f argoproj.io-v1alpha1.Application-argocd-bugtest.yaml -n argocd
+You can do this a bunch of times and the sync will continue to fail and the PreSync hook resources will continue to be there.
+
+1. Now sync again manually but leave the RETRY tickbox TICKED and set the retry limit to 1.
+1. The sync will fail, then retry, then fail, but this time the resources created in the PreSync hook get deleted!
